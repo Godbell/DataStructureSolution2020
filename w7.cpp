@@ -1,6 +1,5 @@
 #include <iostream>
 #include <vector>
-
 class Node
 {
 public:
@@ -37,4 +36,84 @@ public:
             }
         }
     }
+};
+
+
+class TREE
+{
+public:
+    Node* root;
+    std::vector<Node*> tree;
+    int maxdepth;
+
+    TREE(int rootData)
+    {
+      tree.push_back(new Node(rootData, 0));
+      root = tree.front();
+      maxdepth = 0;
+    }
+
+    void insrt(int node, int value)
+    {
+        Node* parentNode = findNodeLinear(node);
+
+        if (parentNode == NULL) return;
+
+        tree.push_back(new Node(value));
+        parentNode->addChild(tree.back());
+
+        updateMaxDepth();
+    }
+
+    void delte(int value)
+    {
+        Node* erased = findNodeLinear(value);
+
+        if (erased == NULL) return;
+
+        if (erased == root) return;
+        else
+        {
+            for (Node*& node : erased->children)
+            {
+                node->setParent(erased->parent);
+                erased->parent->addChild(node);
+            }
+            erased->children.clear();
+            erased->parent->delchild(erased);
+            delete erased;
+        }
+        
+        updateMaxDepth();
+    }
+
+    Node* findNodeLinear(int val)
+    {
+        for (Node*& node : tree)
+        {
+            if (node->value == val)
+            {
+                return node;
+            }
+        }
+        
+        return NULL;
+    }
+
+    int updateMaxDepth()
+    {
+        int _md = 0;
+
+        for (Node* node : tree)
+        {
+            if (node->depth > _md)
+            {
+                _md = node->depth;
+            }
+        }
+
+        maxdepth = _md;
+        return maxdepth;
+    }
+
 };

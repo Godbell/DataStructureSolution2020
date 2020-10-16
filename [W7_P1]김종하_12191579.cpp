@@ -1,16 +1,12 @@
 #include <iostream>
-#include <string>
 #include <vector>
-
-using namespace std;
-
 class Node
 {
 public:
     int value;
     int depth;
     Node* parent;
-    vector<Node*> children;
+    std::vector<Node*> children;
 
     Node(int v = 0, int d = 0)
     {
@@ -42,17 +38,18 @@ public:
     }
 };
 
-
 class TREE
 {
 public:
     Node* root;
-    vector<Node*> tree;
+    std::vector<Node*> tree;
+    int maxdepth;
 
-    TREE()
+    TREE(int rootData)
     {
-      tree.push_back(new Node(1, 0));
+      tree.push_back(new Node(rootData, 0));
       root = tree.front();
+      maxdepth = 0;
     }
 
     void insrt(int node, int value)
@@ -63,6 +60,8 @@ public:
 
         tree.push_back(new Node(value));
         parentNode->addChild(tree.back());
+
+        updateMaxDepth();
     }
 
     void delte(int value)
@@ -84,45 +83,7 @@ public:
             delete erased;
         }
         
-    }
-     
-    void printChilds(int node)
-    {
-        Node* toprint = findNodeLinear(node);
-
-        if (toprint == NULL || toprint->children.size() == 0)
-            cout << 0 << endl;
-        else
-        for (Node* child : toprint->children)
-        {
-            cout << child->value << " ";
-        }
-        cout << endl;
-    }
-
-    void printSiblings(int node)
-    {
-        Node* danode = findNodeLinear(node);
-
-        if (danode == NULL)
-        {
-            cout << 0 << endl;
-            return;
-        }
-
-        Node* parent = danode->parent;
-        if (parent == NULL || parent->children.size() <= 1)
-        {
-            cout << danode->value << endl;
-        }
-        else
-        {
-            for (Node* child : parent->children)
-            {
-                cout << child->value << " ";
-            }
-            cout << endl;
-        }
+        updateMaxDepth();
     }
 
     Node* findNodeLinear(int val)
@@ -137,31 +98,80 @@ public:
         
         return NULL;
     }
+
+    int updateMaxDepth()
+    {
+        int _md = 0;
+
+        for (Node* node : tree)
+        {
+            if (node->depth > _md)
+            {
+                _md = node->depth;
+            }
+        }
+
+        maxdepth = _md;
+        return maxdepth;
+    }
+
+    void preorder(Node* node)
+    {
+        if (!node) return;
+
+        std::cout << node->value << " ";
+        for (int i = 0 ; i < node->children.size(); i++)
+        {
+            preorder(node->children[i]);
+        }
+    }
+    
+    void preorder()
+    {
+        preorder(root);
+    }
+    
+    void postorder(Node* node)
+    {
+        if (!node) return;
+        
+        for (int i = 0 ; i < node->children.size(); i++)
+        {
+            preorder(node->children[i]);
+        }
+
+        std::cout << node->value << " ";
+    }
+
+    void postorder()
+    {
+        postorder(root);
+    }
 };
 
+using namespace std;
 
 int main()
 {
-    int N = 0;
-    int M = 0;
-    cin >> N >> M;
-    TREE tree;
+    int T = 0;
+    cin >> T;
 
-    for (int iter = 0 ; iter < N ; iter++)
+    for (int iter1 = 0 ; iter1 < T ; iter1++)
     {
-        int parent = 0;
-        int child = 0;
+        int N = 0;
+        cin >> N;
+        TREE tree(1);
 
-        cin >> parent >> child;
-        tree.insrt(parent, child);
-    }
+        for (int i = 0 ; i < N ; i++)
+        {
+            int pnode, value;
+            cin >> pnode >> value;
 
-    for (int iter = 0 ; iter < M ; iter++)
-    {
-        int node;
-        cin >> node;
-        
-        cout << tree.findNodeLinear(node)->depth << endl;
+            tree.insrt(pnode, value);
+        }
+
+        tree.preorder();
+        cout << endl;
     }
 
     return 0;
